@@ -1,4 +1,4 @@
-const fs = require("fs");
+var fs = require("fs");
 const inputs:string = fs.readFileSync('./dev/stdin/inputs.txt').toString().trim();
 
 if(!inputs){

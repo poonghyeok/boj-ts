@@ -1,4 +1,4 @@
-const fs = require("fs");
+var fs = require("fs");
 const inputs:Array<string> = fs.readFileSync('./dev/stdn/inputs.txt').toString().split(' ');
 
 interface Coord{

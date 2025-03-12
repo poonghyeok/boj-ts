@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const fs = require("fs");
+var fs = require("fs");
 const inputs = fs.readFileSync('./dev/stdn/inputs.txt').toString().split(' ');
 const getInitCoord = () => { return { x: 0, y: 0 }; };
 class Boj {

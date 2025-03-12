@@ -3,16 +3,14 @@
   "version": "1.0.0",
   "main": "boj1417.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "run": "node",
     "compile": "tsc"
   },
   "author": "",
   "license": "ISC",
   "description": "",
   "dependencies": {
-    "typescript": "^5.8.2"
-  },
-  "devDependencies": {
+    "typescript": "^5.8.2",
     "@types/node": "^22.13.8"
   }
 }
