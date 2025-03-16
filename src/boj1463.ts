@@ -1,114 +1,78 @@
 var fs = require('fs');
 var args:number[] = fs.readFileSync('./input.txt', 'utf8').toString().trim().split(" ").map(input => parseInt(input));
 
-interface ExpandSet{
-  /**
-   * 확장 기존 treeNumSet에 집어넣기
-   */
-  expand(currTreeNumSets : Array<Set<number>>) : void
-
-  /**
-   * 새로운 Set<number> 생성하기
-   * */
-  genSet(currTreeNumSets : Array<Set<number>>) : Set<number>
-
-  /**
-   * 새로운 Set<number>에 속할 수 있는지 확인
-   *
-   * 이전 Set에도 존재하면 안되고 현재 생성되는 Set에도 있으며 안됨.
-   * */
-  isAble2Add2NewSet(currTreeNumSets : Array<Set<number>>, num : number) : boolean
-}
-
 interface IBoj1463 {
   /**
    * 정답 수
    * */
-  answer : number
+  goal: number;
 
   /**
-   * set array
-   * */
-  treeNumSets : Array<Set<number>>
-
-  /**
-   * 초기상태 설정
-   * 첫번쨰 set은 2,3으로 시작
-   * */
-  initState() : void
-
-  /**
-   * set array 확장 모듈
-   * */
-  expandModule : ExpandSet
-
-  /**
-   * 현재 Set(treeNumSet)에 정답이 포함되어 있는지 확인
-   * */
-  containAnswer() : boolean
-
-  /**
-   * 정답 찾기
+   * 가능한 최소수 찾기
    *
-   * 정답이 나올 때까지 Array<Set>을 확장하고 정답이 나오면 Array length 반환
+   * 3의 몇제곱에 근접한 수 인지 찾는다
    * */
-  findAnswerByLoop() : number
+  getPossibleMin(): number;
+
+  /**
+   * 3과 2의 조합으로 goal 또는 goal - 1을 만들 수 있는지 확인
+   * 만들면 만들어진 num return 아니라면 null return
+   * */
+  getComposedNum(goalNum : number, elementsNum : number): number | null;
+
+  /**
+   * 반복을 돌면서 만족하는 배열조합찾기
+   *
+   * 만들어진 배열 길이를 return 한다.
+   * */
+  findAnswerByLoop(goalNum: number, elementsNum : number): number;
 }
 
 class Boj1463 implements IBoj1463 {
-  public answer : number
-  public treeNumSets : Array<Set<number>>
+  public goal: number;
 
-  constructor(arg : number) {
-    this.answer = arg;
-    this.treeNumSets = new Array<Set<number>>();
+  constructor(arg : number
+  ) {
+    this.goal = arg;
   }
 
-  initState() {
-    this.treeNumSets.push(new Set<number>([2,3]));
-  }
-
-  expandModule : ExpandSet = {
-    isAble2Add2NewSet(currTreeNumSets: Array<Set<number>>, num): boolean {
-      return currTreeNumSets.find(set => set.has(num)) === undefined;
-    },
-    expand(currTreeNumSets: Array<Set<number>>) {
-      currTreeNumSets.push(this.genSet(currTreeNumSets));
-    },
-    genSet(currTreeNumSets: Array<Set<number>>): Set<number> {
-      const prevSet = currTreeNumSets[currTreeNumSets.length - 1];
-      const newSet = new Set<number>();
-      prevSet.forEach(num => {
-        const getNums = [num + 1, num * 2, num * 3];
-        getNums.forEach(genNum => {
-          if (this.isAble2Add2NewSet(currTreeNumSets, genNum)) {
-            newSet.add(genNum);
-          }
-        })
-      })
-      return newSet;
+  getPossibleMin(): number {
+    let minVal = 0;
+    while (!(Math.pow(3, minVal) <= this.goal && this.goal < Math.pow(3, minVal + 1))) {
+      minVal++;
     }
+    return this.goal % 3 === 0 ? minVal : minVal + 1;
   }
 
-  containAnswer(): boolean {
-    return this.treeNumSets[this.treeNumSets.length - 1].has(this.answer);
+  getComposedNum( elementsNum : number): number | null{
+    let use2Num = 0;
+    while (true) {
+      const numByComposed = Math.pow(3, elementsNum - use2Num) * Math.pow(2, use2Num++);
+      if (numByComposed === this.goal || numByComposed === this.goal - 1) {
+        return numByComposed;
+      }
+      if (use2Num === elementsNum) {
+        return null;
+      }
+    }
   }
 
   findAnswerByLoop(): number {
-    this.initState();
-    while(!this.containAnswer()){
-      this.expandModule.expand(this.treeNumSets);
+    if (this.goal === 1) {
+      return 0;
     }
-    return this.treeNumSets.length;
-  }
+    let possibleMin = this.getPossibleMin();
 
-  printAnswer(){
-    if (this.answer === 1) {
-      console.log(0);
-      return false;
+    while (true) {
+      const composedNum = this.getComposedNum(possibleMin);
+      if (composedNum) {
+        return composedNum === this.goal ? possibleMin : possibleMin + 1;
+      }
+      possibleMin++;
     }
-    console.log(this.findAnswerByLoop());
   }
 }
 
-new Boj1463(args[0]).printAnswer();
+const boj1463 = new Boj1463(args[0]);
+console.log(boj1463.findAnswerByLoop());
+
