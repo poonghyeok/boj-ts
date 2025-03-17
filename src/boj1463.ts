@@ -49,11 +49,30 @@ class Boj1463 implements IBoj1463 {
       ret: this.goal,
       rest: 0,
     }
+    /**
+     * 2나 3으로 나뉘지 않을 떄까지 나눈다.
+     * */
+    while (initRet.ret % 2 === 0) {
+      initRet.ret = initRet.ret / 2;
+      ans++;
+    }
+    while (initRet.ret % 3 === 0) {
+      initRet.ret = initRet.ret / 3;
+      ans++;
+    }
 
+    if (initRet.ret === 1) {
+      return ans;
+    }
+
+    console.log('start : ', initRet);
     while (initRet.ret > 3) {
-      initRet.rest = initRet.ret % 3;
-      initRet.ret = parseInt((initRet.ret / 3).toFixed());
-      // console.log(initRet);
+      const restDivBy3 = initRet.ret % 3;
+      const able2DivBy3 = restDivBy3 < 2;
+      const divBy = able2DivBy3 ? 3 : 2;
+      initRet.rest = initRet.ret % divBy;
+      initRet.ret = parseInt((initRet.ret / divBy).toFixed());
+      console.log(initRet);
       ans += (1 + initRet.rest);
     }
 
