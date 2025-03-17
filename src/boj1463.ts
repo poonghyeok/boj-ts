@@ -11,75 +11,71 @@ interface IBoj1463 {
    * 정답 수
    * */
   goal: number;
-
   /**
-   * 3으로나눈 몫과 나머지를 반환한다.
+   * 연산 수
    * */
-  getRetNRestDivBy3(num : number): RetNRest;
-
+  ans: number;
   /**
-   * 정답찾기
+   * 숫자를 만들려면 N은 최대 몇제곱까지 쓸 수 있는지
+   * 즉, 주어진 수는 N의 몇제곱보다 큰 지 구한다.
    * */
-  findAnsByLoop(): number;
-
-
+  getMaxNumByNsquare(targetNum: number, squareNum: number): number
+  /**
+   * 2와 3으로 더 이상 나누어지지 않는 수를 만들기 위한 최적의 연산 횟수를 찾는다.
+   * */
+  getMinCalcNum(targetNum : number): number;
 }
 
 class Boj1463 implements IBoj1463 {
   public goal: number;
+  public ans: number = 0;
 
-  constructor(arg : number
+  constructor(arg: number
   ) {
     this.goal = arg;
   }
 
-  getRetNRestDivBy3(num: number): RetNRest {
-    return {
-      ret: num / 3,
-      rest: num % 3,
-    };
-  }
-
-  findAnsByLoop(): number {
-    if (this.goal === 1) {
+  getMinCalcNum(targetNum: number): number {
+    if (targetNum === 1) {
       return 0;
     }
-    let ans = 0;
-    const initRet : RetNRest = {
-      ret: this.goal,
-      rest: 0,
-    }
-    /**
-     * 2나 3으로 나뉘지 않을 떄까지 나눈다.
-     * */
-    while (initRet.ret % 2 === 0) {
-      initRet.ret = initRet.ret / 2;
-      ans++;
-    }
-    while (initRet.ret % 3 === 0) {
-      initRet.ret = initRet.ret / 3;
-      ans++;
+    if (targetNum < 4) {
+      return 1;
     }
 
-    if (initRet.ret === 1) {
-      return ans;
+    let maxNumBy3square = this.getMaxNumByNsquare(targetNum, 3);
+    let minCalcNum;
+    while (maxNumBy3square > -1) {
+      let maxNumBy2square = this.getMaxNumByNsquare(targetNum / Math.pow(3, maxNumBy3square), 2);
+      const rest = targetNum - (Math.pow(3, maxNumBy3square) * Math.pow(2, maxNumBy2square));
+      const calcNum = maxNumBy3square + maxNumBy2square + rest;
+      if (!minCalcNum || minCalcNum > calcNum) {
+        minCalcNum = calcNum;
+      }
+      maxNumBy3square--;
     }
 
-    console.log('start : ', initRet);
-    while (initRet.ret > 3) {
-      const restDivBy3 = initRet.ret % 3;
-      const able2DivBy3 = restDivBy3 < 2;
-      const divBy = able2DivBy3 ? 3 : 2;
-      initRet.rest = initRet.ret % divBy;
-      initRet.ret = parseInt((initRet.ret / divBy).toFixed());
-      console.log(initRet);
-      ans += (1 + initRet.rest);
-    }
+    return minCalcNum;
+  }
 
-    return ans + 1;
+  getMaxNumByNsquare(targetNum: number, squareNum: number): number {
+    let maxNumNSquare = 0;
+    while (!(Math.pow(squareNum, maxNumNSquare) <= targetNum && targetNum < Math.pow(squareNum, maxNumNSquare + 1))) {
+      maxNumNSquare++
+    }
+    return maxNumNSquare;
+  }
+
+  run(): void {
+    this.ans = this.ans + this.getMinCalcNum(this.goal);
+    this.printAns();
+  }
+
+  printAns(): void {
+    console.log(this.ans);
   }
 }
 
 const boj1463 = new Boj1463(args[0]);
-console.log(boj1463.findAnsByLoop());
+boj1463.run();
 
